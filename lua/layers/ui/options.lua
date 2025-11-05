@@ -14,6 +14,6 @@ return {
   statusline_filetype_include = {},
   hl_override = '', -- path of your file that contains highlights
   italic_comments = false,
-  theme = 'onedark', -- default theme
+  theme = 'slime', -- default theme
   transparency = 5,
 }

@@ -81,35 +81,37 @@ cosmos.add_plugin('olimorris/codecompanion.nvim', {
       log_level = 'DEBUG',
     },
     adapters = {
-      openai = function()
-        return require('codecompanion.adapters').extend('openai', {
-          schema = {
-            model = {
-              default = 'gpt-4o',
+      http = {
+        openai = function()
+          return require('codecompanion.adapters').extend('openai', {
+            schema = {
+              model = {
+                default = 'gpt-4o',
+              },
             },
-          },
-        })
-      end,
-      ollama = function()
-        return require('codecompanion.adapters').extend('ollama', {
-          env = {
-            url = 'http://10.0.0.207:11434',
-            -- api_key = "OLLAMA_API_KEY",
-          },
-          headers = {
-            ['Content-Type'] = 'application/json',
-            -- ["Authorization"] = "Bearer ${api_key}",
-          },
-          schema = {
-            model = {
-              default = 'devstral:24b',
+          })
+        end,
+        ollama = function()
+          return require('codecompanion.adapters').extend('ollama', {
+            env = {
+              url = 'http://10.0.0.207:11434',
+              -- api_key = "OLLAMA_API_KEY",
             },
-          },
-          parameters = {
-            sync = true,
-          },
-        })
-      end,
+            headers = {
+              ['Content-Type'] = 'application/json',
+              -- ["Authorization"] = "Bearer ${api_key}",
+            },
+            schema = {
+              model = {
+                default = 'devstral:24b',
+              },
+            },
+            parameters = {
+              sync = true,
+            },
+          })
+        end,
+      },
     },
     strategies = {
       chat = {
@@ -121,13 +123,16 @@ cosmos.add_plugin('olimorris/codecompanion.nvim', {
   },
 })
 
-local use_avante_auto_suggestions = false
+local use_avante_auto_suggestions = true
 
-cosmos.add_plugin('supermaven-inc/supermaven-nvim', {
-  enabled = not use_avante_auto_suggestions,
+-- Amp.nvim - Sourcegraph integration for Neovim
+cosmos.add_plugin('sourcegraph/amp.nvim', {
+  branch = 'main',
+  lazy = false,
   config = function()
-    require('supermaven-nvim').setup({
-      ignore_filetypes = { 'Avante', 'TelescopePrompt' },
+    require('amp').setup({
+      auto_start = true,
+      log_level = 'info',
     })
   end,
 })
@@ -149,8 +154,8 @@ local local_avante_dir = os.getenv('HOME') .. '/workspace/projects/avante.nvim'
 local local_avante_dir_exists = vim.fn.isdirectory(local_avante_dir) == 1
 
 cosmos.add_plugin('ravitemer/mcphub.nvim', {
-  dev = true,
-  dir = os.getenv('HOME') .. '/workspace/projects/mcphub.nvim',
+  -- dev = true,
+  -- dir = os.getenv('HOME') .. '/workspace/projects/mcphub.nvim',
   dependencies = {
     'nvim-lua/plenary.nvim', -- Required for Job and HTTP requests
   },
@@ -466,7 +471,7 @@ cosmos.add_plugin('yetone/avante.nvim', {
     },
     behaviour = {
       auto_focus_sidebar = true,
-      auto_suggestions = false,
+      auto_suggestions = true,
       minimize_diff = true,
       enable_token_counting = true,
       use_cwd_as_project_root = true,

@@ -87,20 +87,17 @@ function configs.cmp()
     --     copilot_keys = copilot_keys_
     --   end
     -- end
-    -- local has_avante, avante_api = pcall(require, 'avante.api')
-    -- local avante_suggestion = nil
-    -- if has_avante then
-    --   avante_suggestion = avante_api.get_suggestion()
-    -- end
-    local has_supermaven, supermaven_suggestion = pcall(require, 'supermaven-nvim.completion_preview')
+    local has_avante, avante_api = pcall(require, 'avante.api')
+    local avante_suggestion = nil
+    if has_avante then
+      avante_suggestion = avante_api.get_suggestion()
+    end
     -- local has_copilot_lua, copilot_lua_suggestion = pcall(require, 'copilot.suggestion')
     if options.tab_complete_copilot_first then
       -- if copilot_keys ~= '' then
       --   vim.api.nvim_feedkeys(copilot_keys, 'i', true)
-      -- elseif avante_suggestion and avante_suggestion:is_visible() then
-      --   avante_suggestion:accept()
-      if has_supermaven and supermaven_suggestion.has_suggestion() then
-        supermaven_suggestion.on_accept_suggestion()
+      if avante_suggestion and avante_suggestion:is_visible() then
+        avante_suggestion:accept()
       -- elseif has_copilot_lua and copilot_lua_suggestion.is_visible() then
       --   copilot_lua_suggestion.accept_line()
       elseif cmp.visible() then
