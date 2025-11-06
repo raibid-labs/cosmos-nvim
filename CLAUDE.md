@@ -6,14 +6,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Neovim configuration called **cosmos-nvim**, a Spacemacs-inspired setup with a layer-based architecture. It provides a VSCode-like experience with Spacemacs keybindings and Vim text objects. The leader key is the spacebar.
 
-**Repository**: Based on https://github.com/yetone/cosmos-nvim
+**Repository Fork Chain**:
+- Original: https://github.com/yetone/cosmos-nvim
+- MacBook M3: https://github.com/beengud/cosmos-nvim
+- **NVIDIA DGX Spark (this fork)**: https://github.com/raibid-labs/cosmos-nvim
+
+**System**: NVIDIA DGX Spark with Linux (Ubuntu/Debian-based)
 
 ## Requirements
 
 - **Neovim 0.8+** (required)
 - **Nerd Fonts** (for icons)
 - **ripgrep** (for file searching)
-- **Chafa** (for GIF rendering, optional: `brew install chafa`)
+- **Chafa** (for GIF rendering, optional: `sudo apt install chafa`)
+- **Git** (for version control and plugin management)
+
+### Installation on DGX Spark (Linux)
+
+```bash
+# Install Neovim (if not already installed)
+sudo apt update
+sudo apt install neovim
+
+# Install ripgrep
+sudo apt install ripgrep
+
+# Install Chafa (optional, for GIF rendering)
+sudo apt install chafa
+
+# Clone this repository
+git clone https://github.com/raibid-labs/cosmos-nvim.git ~/raibid-labs/cosmos-nvim
+
+# Create symlink to Neovim config directory
+ln -sf ~/raibid-labs/cosmos-nvim ~/.config/nvim
+
+# Create user configuration file
+cp ~/.config/nvim/.cosmos-nvim.sample.lua ~/.cosmos-nvim.lua
+
+# Launch Neovim (plugins will be installed automatically)
+nvim
+```
 
 ## Architecture
 
@@ -200,3 +232,79 @@ Within Neovim, install language servers using Mason:
 - The layer system allows enabling/disabling features by layer
 - Uses lazy loading for performance
 - Compatible only with Neovim 0.8+
+
+## Troubleshooting
+
+### "lazy.nvim not found" or plugin loading issues
+
+**Symptom**: Neovim fails to load with errors about lazy.nvim or plugins not being found.
+
+**Common Causes**:
+1. **Broken symlink**: The `~/.config/nvim` symlink may be pointing to the wrong location
+2. **Missing user config**: The `~/.cosmos-nvim.lua` file doesn't exist
+3. **Permission issues**: Plugin directories don't have proper permissions
+
+**Solutions**:
+
+```bash
+# 1. Verify symlink is correct
+ls -la ~/.config/nvim
+# Should show: ~/.config/nvim -> /home/beengud/raibid-labs/cosmos-nvim
+
+# 2. Fix broken symlink
+rm ~/.config/nvim
+ln -sf ~/raibid-labs/cosmos-nvim ~/.config/nvim
+
+# 3. Create user config if missing
+cp ~/.config/nvim/.cosmos-nvim.sample.lua ~/.cosmos-nvim.lua
+
+# 4. Check lazy.nvim installation
+ls -la ~/.local/share/nvim/lazy/lazy.nvim
+
+# 5. If lazy.nvim is missing, it will auto-install on first launch
+# Just launch nvim and wait for installation to complete
+nvim
+
+# 6. If issues persist, remove plugin cache and reinstall
+rm -rf ~/.local/share/nvim/lazy
+nvim  # Will reinstall all plugins
+```
+
+### Plugin installation fails
+
+**Symptom**: Plugins fail to install or update.
+
+**Solution**:
+```bash
+# Ensure git is installed
+git --version
+
+# Check internet connectivity
+ping -c 3 github.com
+
+# Clear lazy.nvim lock file
+rm ~/.config/nvim/lazy-lock.json
+
+# Relaunch and sync
+nvim +Lazy
+# Press 'S' to sync all plugins
+```
+
+### LSP servers not working
+
+**Symptom**: Language servers don't provide completions or diagnostics.
+
+**Solution**:
+```vim
+" Inside Neovim
+:checkhealth lsp
+:MasonInstall <language-server>
+" Example: :MasonInstall pyright lua-language-server
+```
+
+## DGX Spark Specific Notes
+
+- This configuration is optimized for development on NVIDIA DGX Spark systems
+- For CUDA development, install relevant LSP servers: `clangd`, `cmake-language-server`
+- Python development may require setting `python3_host_prog` in `~/.cosmos-nvim.lua`
+- For maximum performance, ensure Neovim is using the system's GPU-optimized libraries
